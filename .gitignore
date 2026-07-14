@@ -13,6 +13,9 @@
 # 只跟踪 skills 目录及其全部内容
 !/skills/
 
+# 额外跟踪 OMC(oh-my-Codex)的 Agent 配置文件
+!/AGENTS.md
+
 # 额外保险：即使被意外加入，也强制忽略常见敏感/大文件类型
 *.sqlite
 *.sqlite-shm

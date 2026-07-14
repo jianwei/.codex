@@ -1,0 +1,5 @@
+# @author Codex (K2.6)
+interface:
+  display_name: "Tuniu Design"
+  short_description: "从截图提炼可复用 Design System"
+  default_prompt: "Use $tuniu-design 根据 App 设计理念和截图提炼可复用设计规范与 design tokens。"

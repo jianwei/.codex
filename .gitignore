@@ -1,0 +1,23 @@
+# @author Claude Code (kimi-2.7-code)
+# 本仓库仅用于备份/同步 Codex 的 skills 目录。
+# ~/.codex 是 Codex CLI 的配置与数据目录，包含大量敏感文件
+# （auth.json、config.toml、history.jsonl）与超大二进制（*.sqlite 达 1.6GB），
+# 这些都必须排除在版本控制之外。
+
+# 默认忽略所有顶层文件与目录
+/*
+
+# 但保留本 .gitignore 自身，便于他人了解同步策略
+!/.gitignore
+
+# 只跟踪 skills 目录及其全部内容
+!/skills/
+
+# 额外保险：即使被意外加入，也强制忽略常见敏感/大文件类型
+*.sqlite
+*.sqlite-shm
+*.sqlite-wal
+auth.json
+*.key
+*.pem
+.env

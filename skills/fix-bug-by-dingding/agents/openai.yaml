@@ -1,0 +1,4 @@
+interface:
+  display_name: "Fix Bug by DingDing"
+  short_description: "按钉钉 bug 表逐项修复、截图对比、单独提交并回写 done"
+  default_prompt: "Use $fix-bug-by-dingding to read DingDing bug rows, fix them one by one, capture before/after screenshots, commit each fix, and mark local as done."

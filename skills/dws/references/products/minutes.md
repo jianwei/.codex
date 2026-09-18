@@ -7,8 +7,8 @@ minutes 模块的命令是**两级或三级结构**，不同层级之间不能�
 > **默认 scope 规则**：`dws minutes list` 后**必须**跟 scope 子命令。若用户未明确指定查询范围，**一律默认补 `all`**（查询我可访问的所有听记 = 我创建的 + 他人共享给我的，覆盖面最广）。
 >
 > **`list` 不带 scope 的陷阱（0519 P2 Golden Case 提炼）**：
-> - 裸 `dws minutes list`（不跟 mine/shared/all）虽然不会报错，但返回结果**不完整**（仅返回最近少量条目，约 913 字节）
-> - `dws minutes list all` 才能返回完整列表（约 3362 字节）
+> - 裸 `dws minutes list`（不跟 mine/shared/all）**不会返回任何听记数据**——它只打印该命令的帮助/用法信息（Usage、Available Commands: all/mine/shared、Flags），等于什么都没查到
+> - 必须带 scope 子命令（`dws minutes list all` / `list mine` / `list shared`）才会真正返回听记列表
 > - **AI 严禁使用裸 `dws minutes list`**，必须始终带 scope 子命令
 > - 如果 LLM 不确定用哪个 scope，**一律用 `all`**
 >
@@ -26,7 +26,7 @@ dws minutes
 │   ├── shared [--query] [--start] [--end] [--max] [--next-token]     # 仅查询他人共享给我的听记（不含我自己创建的）
 │   └── all [--query] [--start] [--end] [--max] [--next-token]        # 查询我可访问的所有听记（= mine ∪ shared，覆盖面最广，默认 scope）
 ├── get <subcommand>                 # 获取听记详情（get 后必须跟子命令名）
-│   ├── info --id <uuid>             # 获取听记基础信息（标题、时长、参与人、状态等）
+│   ├── info --id <uuid>             # 获取听记基础信息（标题、时长、开始时间、taskUuid、访问链接；不含参会人）
 │   ├── summary --id <uuid>          # 获取听记 AI 摘要（结构化纪要）
 │   ├── transcription --id <uuid>    # 获取听记语音转写原文（逐字稿，支持分页）
 │   ├── keywords --id <uuid>         # 获取听记关键词
@@ -77,7 +77,7 @@ dws minutes
 | `dws minutes list all --end-time "..."` | 参数名是 `--end` 不是 `--end-time` | `dws minutes list all --end "2026-04-30"` |
 | `dws minutes list --page-size 10` | `--page-size` 不存在，分页用 `--max`；且 `list` 后缺 scope | `dws minutes list mine --max 10` |
 | `dws minutes list --date-range 2026-05-04 2026-05-10` | `--date-range` 不存在，时间范围用 `--start` + `--end` 两个参数；且 `list` 后缺 scope | `dws minutes list mine --start "2026-05-04T00:00:00+08:00" --end "2026-05-10T23:59:59+08:00"` |
-| `dws minutes list mine --limit 10` | `--limit` 尚未注册（跨产品规约 Primary 为 `--limit`，但 minutes CLI 当前只接受 `--max`）。**待 alias 注册后两者等价** | `dws minutes list mine --max 10` |
+| `dws minutes list mine --limit 10` | 不报错——`--limit` 已注册为 `--max` 的合法别名，两者完全等价（`--limit 3` 与 `--max 3` 返回相同条数） | `dws minutes list mine --max 10`（或 `--limit 10`，二选一即可） |
 | `dws minutes upload create --json '{"fileName":...}'` | `--json` 不存在，cli 不接受 JSON 作为输入格式 | `dws minutes upload create --file-name "xxx.mp3" --file-size 61565431` |
 | `dws minutes upload create -f json '{"fileName":...}'` | `-f json` / `--format json` 是**输出格式**控制，不是输入参数 | `dws minutes upload create --file-name "xxx.mp3" --file-size 61565431 --format json` |
 | `dws minutes get transcription --id <uuid> \| head -c 2000` | Windows 沙箱无 `head` 命令，**严禁使用 shell 管道截断** | `dws minutes get transcription --id <uuid> --format json`（由 AI 在内存中截断处理） |
@@ -90,7 +90,7 @@ dws minutes
 | `dws minutes transcribe --url <听记url>` | `transcribe` 不是合法子命令，`--url` 参数也不存在。LLM 凭印象编造 | 先从 URL 提取 taskUuid（见「URL → taskUuid 自动提取规则」），再 `dws minutes get transcription --id <taskUuid> --format json` |
 | `dws minutes get transcription --url <听记url>` | `--url` 参数不存在，`--id` 只接受纯 taskUuid | 同上：从 URL 提取 taskUuid 后用 `--id` |
 | `dws minutes summary --uuid <uuid>` | `summary` 不是顶层子命令（应在 `get` 下），且顶层不识别 `--uuid`。**0519 高频错误** | `dws minutes get summary --id <uuid>` |
-| `dws minutes list`（不跟 scope） | `list` 后**必须**跟 scope（mine/shared/all）。裸 `list` 返回结果不完整且行为未文档化 | `dws minutes list all`（默认 scope） |
+| `dws minutes list`（不跟 scope） | `list` 后**必须**跟 scope（mine/shared/all）。裸 `list` 只打印帮助信息，不返回任何听记数据 | `dws minutes list all`（默认 scope） |
 | `dws report inbox --format json`（无时间窗口） | `inbox` 是兼容入口，等价于 `inbox list`；仍必须带 `--start` / `--end` | `dws report inbox list --start "2026-05-06T00:00:00+08:00" --end "2026-05-13T23:59:59+08:00" --format json` |
 | `dws report inbox list --format json`（不带 --start） | inbox list **必须**带 `--start` / `--end` 参数，否则报 "flag --start is required" | `dws report inbox list --start "2026-05-06T00:00:00+08:00" --end "2026-05-13T23:59:59+08:00" --format json` |
 
@@ -102,14 +102,14 @@ dws minutes
 >
 > | 语义 | 规约 Primary | minutes 当前 CLI 实际参数 | alias 注册状态 | 说明 |
 > |------|-------------|------------------------|--------------|------|
-> | 单页大小 (Group 13) | `--limit` | `--max` | `--limit` 未注册 | minutes 用 `--max`，其他模块用 `--limit`。**跨模块切换时注意差异** |
+> | 单页大小 (Group 13) | `--limit` | `--max`（`--limit` 为合法别名） | `--limit` 已注册 | minutes 推荐 `--max`，但 `--limit` 也可用，两者等价 |
 > | 续页标识 (Group 14) | `--cursor` | `--next-token` | `--next-token` 在 alias 池中 | minutes 用 `--next-token`，合法 alias |
 > | 搜索关键词 (Group 11) | `--query` | `--query` | 已对齐 | 无差异 |
 > | 起始时间 (Group 15) | `--start` | `--start` | 已对齐 | 无差异 |
 > | 结束时间 (Group 16) | `--end` | `--end` | 已对齐 | 无差异 |
 >
 > **跨模块参数名差异速查（防止混用）：**
-> - 分页大小：minutes 用 `--max`，aitable/calendar/chat/drive 用 `--limit`
+> - 分页大小：minutes 推荐 `--max`（`--limit` 也是合法别名，等价），aitable/calendar/chat/drive 用 `--limit`
 > - 续页标识：minutes 用 `--next-token`，aitable/drive/doc 用 `--cursor`
 > - 起止时间：minutes/report 用 `--start`/`--end`，calendar 用 `--start-time`/`--end-time`（跨模块最高频错误）
 
@@ -260,8 +260,8 @@ dws minutes
 > | `missing required flag(s): --session-id` | cancel 命令必须传 session-id | 从之前 upload create 的返回中提取 session-id；若丢失则暂无法取消 |
 >
 > **上传流程三步走**（AI 必须按此顺序执行，不可跳步）：
-> 1. `dws minutes upload create --file-name "xxx.mp3" --file-size <字节数> --format json` → 获取 `sessionId` + `uploadUrl`
-> 2. 将文件通过 `uploadUrl` 直传（由客户端侧完成，AI 不介入）
+> 1. `dws minutes upload create --file-name "xxx.mp3" --file-size <字节数> --format json` → 获取 `sessionId` + `presignedUrl`
+> 2. 将文件通过 `presignedUrl` 直传（由客户端侧完成，AI 不介入）
 > 3. `dws minutes upload complete --session-id <sid> --format json` → 确认上传完成
 >
 > **注意**：`--file-size` 单位是**字节**（不是 KB/MB），AI 不要帮用户估算大小，应让用户确认文件实际字节数。
@@ -306,9 +306,12 @@ dws minutes
 │   ├── create --file-name "..." --file-size <n>
 │   ├── complete --session-id <sid>
 │   └── cancel --session-id <sid>
-└── permission <subcommand>
-    ├── add --ids <uuid1,uuid2> --member-uids <uid1,uid2> --policy <0-4> [--cover] [--sub-resources "..."]
-    └── remove --ids <uuid1,uuid2> --member-uids <uid1,uid2>
+├── permission <subcommand>
+│   ├── add --ids <uuid1,uuid2> --member-uids <uid1,uid2> --policy <0-4> [--cover] [--sub-resources "..."]
+│   └── remove --ids <uuid1,uuid2> --member-uids <uid1,uid2>
+└── tag <subcommand>                 # 听记标签/分组管理（标签在听记页面手动创建）
+    ├── list                         # 查询我的听记标签/分组列表（返回 tagId 和标签名称）
+    └── query --tag-id <tagId> [--limit] [--cursor]   # 根据标签ID查询该标签下的听记列表
 ```
 
 ## 命令总览
@@ -380,7 +383,7 @@ Flags:
       --id string   听记 taskUuid (必填)，取值逻辑参考 ## 注意事项
 ```
 
-返回字段: 创建人、开始时间、截止时间、听记标题、听记访问链接URL
+返回字段（result 内）: `duration`(时长, 秒)、`startTime`(开始时间, 毫秒时间戳)、`endTime`(结束时间, 仅较长会议返回, 短录音无此字段)、`taskUuid`(听记 ID)、`title`(听记标题)、`url`(听记访问链接)。注意: **不返回创建人(creator)字段**。
 
 **发言人列表输出规范（查询详情后必须执行）**：
 
@@ -615,7 +618,7 @@ AI 基于已拉取的转写数据，**本地完成**聚类与摘要（无需新�
 > **铁律 2：严禁用 AI 摘要里的"参与人/参会人"字段判断某人是否参会**
 > - AI 摘要中的"参与人"字段往往**只截取最显著的 1-2 个名字**（通常是创建人或发言最多的人），**不是完整参会人列表**
 > - "AI 摘要参与人只有故愚 → 灵麦没参会" 是典型的错误推理链
-> - 如果一定要列出参会人，应使用 `dws minutes get info` / `get batch` 返回的 `participants` 字段，而不是摘要文本里的描述
+> - 如果一定要列出参会人，只能从 `get transcription` 的转写发言人（`speakerName`/`speakerId`）汇总——`get info` / `get batch` **均不返回** `participants` 结构化字段（get info 只返回 duration/startTime/taskUuid/title/url，get batch 只返回 creatorNick/creatorUnionId/status 等），别指望从它们拿参会名单
 >
 > **铁律 3：通讯录查询是 Step 4 的强制起点，不依赖 Step 3 是否成功**
 > - Step 2 一旦返回"未命中真名标注"，**Step 3 与 Step 4 ① 必须并发触发**，不要等 Step 3 失败再补查
@@ -664,7 +667,7 @@ Step 7: 引导用户替换发言人（调用 speaker replace 写回听记）
 > - **未命中真名标注 ≠ 目标人物没参会**——绝大多数听记的发言人都是匿名编号，"未命中"是**默认场景**，恰恰是发言人识别功能要解决的问题
 > - **不要在转写文本里 grep 目标人名**作为存在性判断——花名/真名通常不会出现在 TA 自己的发言里（参见铁律 1）
 > - **不要把 `dws minutes get summary` 摘要文本里写到的"参与人"当作完整参会列表**——AI 摘要里的"参与人"字段只截取最显著的 1-2 个名字，不是完整名册（参见铁律 2）
-> - 唯一能下"目标人物没参会"结论的场景是：`get info` / `get batch` 返回的结构化 `participants` 字段里**完整列出参会人且不含目标**，且 `dws contact user search` 也搜不到该人 → 才允许告知用户"该人不在参会列表"
+> - 听记各接口都拿不到权威的完整参会名册：`get info` / `get batch` **均不返回** `participants` 字段，转写发言人列表又常是匿名编号。因此**几乎无法**仅凭听记数据下"目标人物没参会"的结论；只有当转写发言人已全部实名标注且不含目标、且 `dws contact user search` 也搜不到该人时，才可谨慎告知"未在可见发言人中找到该人"
 
 ##### Step 3: 转写原文内推断（优先）
 
@@ -810,7 +813,7 @@ Flags:
       --ids string   听记 taskUuid 列表，逗号分隔 (必填)
 ```
 
-返回字段: 听记标题、时长、参与人列表、创建时间、taskUuid、听记状态
+返回字段: `result.minutesDetails` 数组，每项含 `title`(标题)、`durationMicros`(时长, 微秒)、`startTime`(开始时间, 毫秒)、`taskUuid`、`status`(状态)、`creatorNick`(创建人昵称)、`creatorUnionId`、`size`、`bizType`、`isDeleted`。**不返回参会人列表**。
 
 ### 修改听记标题
 ```
@@ -824,6 +827,7 @@ Flags:
 ```
 
 ### 发起听记（开始录音）
+
 ```
 Usage:
   dws minutes record start [flags]
@@ -1207,6 +1211,41 @@ Flags:
 - 如果成员是听记的创建者（所有者），无法通过此命令移除其权限
 - 建议在移除前先确认成员的当前权限，避免误操作
 
+### 查询我的听记标签/分组列表
+```
+Usage:
+  dws minutes tag list
+```
+
+查询当前用户在听记页面手动创建的所有标签或分组列表。无需传入额外参数，系统自动识别当前用户身份。
+返回所有标签/分组的列表，每条记录包含 tagId 和标签名称。获取到 tagId 后，可使用 `dws minutes tag query --tag-id <tagId>` 查询该标签下的听记列表。
+
+**注意事项：**
+- 标签/分组在听记页面手动创建，此命令仅提供查询能力
+- 返回的 tagId 用于后续 `tag query` 命令的 `--tag-id` 参数
+
+### 根据标签ID查询听记列表
+```
+Usage:
+  dws minutes tag query [flags]
+Example:
+  dws minutes tag query --tag-id <tagId>
+  dws minutes tag query --tag-id <tagId> --limit 20
+  dws minutes tag query --tag-id <tagId> --limit 10 --cursor <nextToken>
+Flags:
+      --tag-id string     标签/分组 ID，可通过 tag list 获取 (必填)
+      --limit float       每页数据条数 (默认 10)
+      --cursor string     分页 token (首页留空)
+```
+
+根据用户的标签或分组 ID 查询该标签下的听记列表。支持分页查询。
+tagId 可通过 `dws minutes tag list` 获取。
+
+**注意事项：**
+- `--tag-id` 必填，值来自 `dws minutes tag list` 返回的 tagId
+- 支持分页，使用 `--cursor` 传入上一次返回的 nextToken
+- 标签/分组在听记页面手动创建，不支持通过 CLI 创建标签
+
 ## 意图判断
 
 ### 发起听记
@@ -1586,6 +1625,27 @@ Flags:
 1. 用户说"把张三加到这个听记中" → AI 需获取张三的 UID
 2. 调用 `dws contact user search --query "张三" --format json` 获取 UID
 3. 调用 `dws minutes permission add --ids <taskUuid> --member-uids <uid> --policy 4 --format json`
+
+### 听记标签/分组查询
+用户说"我的听记标签/听记分组/听记有哪些标签/有哪些分组" → `tag list`
+用户说"查看某个标签下的听记/这个标签下有哪些听记/按标签查听记" → `tag query`
+
+**自然语言示例：**
+- "我的听记有哪些标签"
+- "帮我看看听记的分组列表"
+- "查一下'周会'标签下有哪些听记"
+- "按标签筛选听记"
+
+**路由规则：**
+- 用户提到"标签列表/分组列表/有哪些标签/有哪些分组" → `tag list`
+- 用户提到"按标签查/某个标签下的听记/标签筛选" → 先 `tag list` 获取 tagId，再 `tag query --tag-id <tagId>`
+- 如果用户直接提供了 tagId → 直接 `tag query --tag-id <tagId>`
+- 如果用户提供标签名称而非 tagId → 先 `tag list` 查找对应 tagId，再 `tag query`
+
+**典型执行链路：**
+1. 用户说"帮我看看'周会'标签下的听记" → AI 先获取标签列表
+2. 调用 `dws minutes tag list --format json` → 从返回中按名称匹配找到 tagId
+3. 调用 `dws minutes tag query --tag-id <tagId> --format json`
 
 ### 修改听记标题
 用户说"改听记标题/重命名听记/修改标题" → `update title`
@@ -2239,7 +2299,7 @@ Step 2 **[禁止]** 看到全是匿名编号 → 没有继续走 Step 3-4，反�
 
 1. **"在转写里搜不到目标人名"绝不构成"没参会"的证据**：花名/真名通常不出现在 TA 自己的发言里，这是默认场景而非例外。99% 的听记发言人都是匿名编号——这正是发言人识别功能要解决的问题。
 
-2. **AI 摘要的"参与人"字段是低保真信号，不能作为参会判断依据**：`get summary` 返回的是 AI 生成的自然语言摘要，里面提到的"参与人"通常只是最显著的 1-2 人；要拿完整参会列表，应使用 `get info` / `get batch` 返回的结构化 `participants` 字段。
+2. **AI 摘要的"参与人"字段是低保真信号，不能作为参会判断依据**：`get summary` 返回的是 AI 生成的自然语言摘要，里面提到的"参与人"通常只是最显著的 1-2 人。而 `get info` / `get batch` **均不返回**结构化 `participants` 字段，无法从中拿完整参会列表；能拿到的只有 `get transcription` 的转写发言人（常为匿名编号）。
 
 3. **`dws contact user search` 是 Step 4 ① 的必跑项，单次调用就能突破死局**：本案例的整个失败链路只要有 1 次通讯录查询就能立即扭转——拿到"木兰=王佳明，产品设计部"后，Step 5 的角色匹配就有了锚点，再也不会得出"没参会"的错误结论。
 
@@ -2392,3 +2452,64 @@ Step 2 **[禁止]** 看到全是匿名编号 → 没有继续走 Step 3-4，反�
 3. 用户给了钉钉 URL 时，我有没有从 URL 提取 taskUuid/dentryUuid 后走 dws，而不是 browser_use？
 4. 用户的请求模糊（如"总结下我的会议"）时，我是先 `dws minutes list mine` 列出来，还是反问要细节？
 5. 用户要写报告/总结/日报但没提"听记"时，我有没有判断"任务产出是否依赖会议讨论内容"？如果依赖 → 听记采集不能省略（参见间接意图识别三条铁律）
+
+### 案例 9：长听记按时间区间总结，转写没翻页到目标区间就硬总结 → 答非所问（202606 P0 实锤复盘）
+
+> 这是一次**有 SLS 日志实锤根因**的真实事故：同一篇 1 小时+ 的长听记、同一个"总结某时间区间"的诉求，弱档位答错、强档位答对，但根因**不是模型能力，而是转写没拉到用户要的时间区间**。本案例用于固化"转写覆盖校验"铁律（详见案例 3 末尾的铁律）。
+
+**用户输入：**
+```
+总结里面 57:52 开始到 01:05:44 的内容给我，形成关键的三件事及拆解
+https://shanji.dingtalk.com/app/transcribes/<taskUuid>   （一篇时长 1 小时+ 的会议听记）
+```
+
+**[错误] 真实失败链路（SLS 日志实锤）：**
+
+```
+Step 1 [完成] 从 URL 提取 taskUuid → get transcription 拉第 1 页（50 段，到 8:59）
+   ↓
+Step 2 [完成] 续翻第 2 页（到 19:23）、第 3 页（到 26:34）、第 4 页（到 31:09）
+   ↓
+Step 3 [禁止] 翻到 31:09 时撞上字符上限 / 步数预算 → 停止翻页
+   ↓
+错误动作：手里只有 0:02 ~ 31:09 的转写，但用户要的是 57:52 ~ 01:05:44
+   ↓
+错误结论：在"前 31 分钟"的内容里硬找"57 分钟那段"，拼出一个"关键三件事"
+   ↓
+后果：总结的内容和用户要的那段完全对不上，用户评"总结的一般"，被迫换更强模型重做
+```
+
+> **强档位为什么"答对了"**：换档位重做时，翻页继续推进到了 **63:53**，**覆盖了 57:52~01:05:44 整段**，所以答对了——**对的是"把转写翻到了目标区间"，不是"模型更聪明"**。SLS 日志清晰记录了两轮的翻页进度：弱档位止于 31:09（漏掉目标区间），强档位推进到 63:53（覆盖目标区间）。
+
+**这条链路的核心错误：**
+
+| 反模式 | 后果 |
+|--------|------|
+| 用户给了明确时间区间（57:52~01:05:44），却没翻页到该区间就停 | 目标区间的转写**根本没进上下文**，总结无源可依 |
+| 拿"前 31 分钟"的内容冒充"用户要的 57 分钟那段" | 答非所问，且用户不知道 AI 其实只拉到了 31:09 |
+| 撞字符上限时只想着"是否继续"，没意识到"目标区间还没拉到" | 即使提示了"是否继续"也没说清"为什么必须继续"，提示无效 |
+| 答错后归因为"模型不行、换强模型" | 真正要修的是取数覆盖校验，归因错了优化方向就错了 |
+
+**[正确] 应该这样执行：**
+
+1. **解析目标区间**：`57:52` → 3472000ms，`01:05:44` → 3944000ms。
+2. **从 URL 提取 taskUuid** → `dws minutes get transcription --id <taskUuid> --format json` 拉第一页，拿 `nextToken` 和本页段落 `endTime` 最大值。
+3. **按 `endTime` 校验覆盖**：每翻一页，检查"已拉取段落的 `endTime` 最大值"是否 ≥ 3944000ms（目标区间上界）。
+   - 未达到 且 `hasNext=true` → **继续翻页**（即使中途超过 12000 字符，也要明确告知用户"目标区间还在后面、需继续翻页"，而不是停下硬总结）。
+   - 已达到 / `hasNext=false` → 停止翻页，进入分析。
+4. **截取目标区间**：从拉取到的全部段落里，筛出 `startTime`/`endTime` 落在 [3472000, 3944000] 的段落，**只对这一段**做"关键三件事 + 拆解"。
+5. **若翻页耗尽仍没到 57:52**（听记总时长 < 57:52）→ 准确提示："这篇听记总时长约 X 分钟，你要的 57:52 超出了实际长度，是不是时间点记错了？"
+6. **若因字符上限暂停且尚未覆盖目标区间** → 准确提示（见案例 3 铁律第 4 条的话术），让用户在"继续翻页 / 缩小范围"间选择，**绝不拿没覆盖的内容硬总结**。
+
+**本案例固化的关键经验（强制吸收）：**
+
+1. **用户给了时间区间 = 必须翻页到该区间才能总结**：`get transcription` 是从头顺序分页的，区间靠后就得一直翻到那里。中途停 = 目标区间没进上下文。
+2. **"撞字符上限"不是停止翻页的理由，"已覆盖目标区间"才是**：用户明确指定区间时，覆盖校验优先于字符上限——没覆盖就得继续翻（或准确提示用户），不能闷头停。
+3. **答错后先查"取数是否拉全"，再怀疑模型**：本案例换强模型答对是假象，真因是取数覆盖。遇到"总结不准"的长听记 case，第一反应应是"目标区间的转写拉到了吗"。
+4. **提示必须准确到"已拉到哪 / 目标区间在不在"**：模糊的"是否继续拉取"对用户无意义；必须告诉用户"已拉到 31:09，你要的 57:52 还没拉到"。
+
+**绝对禁止：**
+- **[禁止]** 用户指定了时间区间，却没翻页到该区间（按 `endTime` 校验）就开始总结
+- **[禁止]** 拿"已拉到的前半段"冒充"用户要的后半段区间"硬凑答案，且不告知用户实际只拉到了哪里
+- **[禁止]** 因字符上限/步数预算停止翻页时，只说"已达上限是否继续"而不说明"目标区间尚未拉到"
+- **[禁止]** 把"总结不准"归因为模型能力、直接建议换模型——先核对取数是否覆盖了用户请求的时间区间

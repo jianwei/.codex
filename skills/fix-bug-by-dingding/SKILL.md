@@ -1,6 +1,6 @@
 ---
 name: fix-bug-by-dingding
-description: Fix bug tasks tracked in a DingDing document or sheet. Use when the user asks to read a DingDing bug list/document and repair specified numbered bugs with mandatory before/after screenshots, self-comparison, relevant build/test verification, one commit per bug, the DingDing issue description as the commit message, and DingDing local column updated to done.
+description: Fix bug tasks tracked in a DingDing document or sheet. Use when the user asks to read a DingDing bug list/document and repair specified numbered bugs with mandatory before/after screenshots, self-comparison, relevant build/test verification, one commit per bug, the DingDing row number plus issue description as the commit message, and DingDing local column updated to done.
 ---
 
 # Fix Bug By DingDing
@@ -19,9 +19,12 @@ For every requested bug, complete all items below before moving to the next bug:
 - Start the local app yourself and locate the page/reproduction entry yourself.
 - Run the relevant build and/or test command for the changed surface.
 - Create exactly one commit for that bug.
-- Use the DingDing problem description as the commit message.
+- Include the DingDing row number and problem description in the commit message.
 - Update the DingDing `local` column to `done`.
 - Read the DingDing row back and confirm `local` is `done`.
+- Before starting each bug, output the bug's row number and complete current bug content.
+- After finishing each bug, output that the bug has been fixed. If it cannot be fixed or no code change is needed, output the reason instead.
+- After all requested bugs are processed, output a final summary.
 
 If a screenshot or verification command is technically impossible, stop and explain the blocker instead of silently skipping it.
 
@@ -30,7 +33,7 @@ If a screenshot or verification command is technically impossible, stop and expl
 1. Load the DingDing workflow first.
    - Use the `dws` skill/tooling to read the DingDing document or sheet.
    - Identify the requested bug numbers exactly. Treat user numbering as the source of truth.
-   - When the first row is the title/header row, map bug number `N` to sheet row `N + 1`; for example, bug 55 is on sheet row 56.
+   - The number provided by the user is the current sheet row number and must be used directly; do not add or subtract any offset. For example, bug number `55` means sheet row `55`.
    - Record the bug number, actual sheet row/range, page, issue description, assignee/status, and the `local` column cell for every requested bug.
 
 2. Inspect the repository before editing.
@@ -48,10 +51,12 @@ If a screenshot or verification command is technically impossible, stop and expl
    - Ask the user only when reproduction requires external credentials, captcha/manual verification, unavailable private data, or a decision that cannot be inferred safely.
 
 4. Fix one bug at a time.
+   - Before modifying the bug, output the current bug row number and complete bug content, including the page, issue description, assignee/status, and `local` value.
    - Before changing code, reproduce or inspect the issue in the real local page.
    - Capture a before screenshot and save it with a stable path such as `/tmp/<repo>-bug<N>-before.png`.
    - Make a surgical code change that directly addresses the bug. Do not bundle unrelated cleanup.
    - Capture an after screenshot, compare it yourself against the before screenshot, and iterate until the visual or behavioral problem is fixed.
+   - After the bug is processed, output `已修改好` and include the verification result. If the bug cannot be fixed or no change is needed, output the specific reason instead and do not claim it was fixed.
 
 5. Verify each bug before committing.
    - Run the smallest meaningful build and/or test check for the changed surface. For this Vue/Vite project, prefer `rtk pnpm build:domestic` or the relevant app build.
@@ -62,18 +67,18 @@ If a screenshot or verification command is technically impossible, stop and expl
    - Set the bug row’s `local` cell to `done`.
    - Read the row back and confirm `local` displays `done`.
    - Stage only the files for this bug.
-   - Commit once, with the commit message exactly equal to the DingDing issue description.
+   - Commit once. The commit message must include the current sheet row number and the DingDing issue description, using the format `第<行号>行 <问题描述>`.
    - Verify `git log -1 --oneline` and `git status -sb` before moving to the next bug.
 
 7. Finish cleanly.
    - Repeat steps 3-6 for each requested bug.
    - Stop any local dev server you started.
-   - Final response in Chinese: list each bug number, commit hash/message, verification command result, screenshot paths, DingDing `done` confirmation, and current git status.
+   - Final response in Chinese must provide a summary of every bug, including the bug number and content, fixed/not-fixed/no-change result and reason when applicable, commit hash/message, verification command result, screenshot paths, DingDing `done` confirmation, and current git status.
 
 ## Requirements
 
 - One fixed bug equals one commit. Never combine multiple requested bugs in one commit unless the user explicitly changes this requirement.
-- Commit message must be the problem description from DingDing, not a generated summary.
+- Commit message must include the current sheet row number and the problem description from DingDing, not a generated summary. Use the format `第<行号>行 <问题描述>`.
 - Before and after screenshots are mandatory. If a bug is not visually representable, capture the closest observable before/after state and explain it.
 - Self-comparison of screenshots is mandatory. Do not ask the user to compare for you.
 - Page/reproduction discovery is the agent's responsibility. Do not require the user to provide a URL when the page can be inferred from the DingDing first column and repository routes.

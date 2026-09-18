@@ -13,8 +13,14 @@
 # 只跟踪 skills 目录及其全部内容
 !/skills/
 
-# 额外跟踪 OMC(oh-my-Codex)的 Agent 配置文件
+# 跟踪 Codex 全局规则索引
 !/AGENTS.md
+
+# 跟踪 AGENTS.md 引用的独立规则文件
+!/agent-rules/
+
+# 跟踪自定义代理的模型与推理强度配置
+!/agents/
 
 # 额外保险：即使被意外加入，也强制忽略常见敏感/大文件类型
 *.sqlite

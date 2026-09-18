@@ -1,0 +1,5 @@
+# @author Codex (gpt-5.6-sol)
+interface:
+  display_name: "SVN 历史同步到 Git"
+  short_description: "不切换工作树，将 SVN 修订安全重建或快进到本地分支"
+  default_prompt: "使用 $sync-svn-history-to-git 将指定 SVN 修订区间安全同步到本地 Git；若我未要求新分支，先询问合并目标，并在推送前停下。"

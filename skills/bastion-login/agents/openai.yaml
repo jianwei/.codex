@@ -1,0 +1,5 @@
+# @author Codex (gpt-5.6-sol)
+interface:
+  display_name: "堡垒机登录"
+  short_description: "可见认证后在 Codex PTY 安全复用堡垒机会话"
+  default_prompt: "使用 $bastion-login 检查或建立可见认证，并在 Codex PTY 中连接我明确指定的目标主机。"

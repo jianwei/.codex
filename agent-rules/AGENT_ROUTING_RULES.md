@@ -1,6 +1,6 @@
 # 代理路由
 
-每次收到任务时，先按任务复杂度选择执行方式；具体模型按 [模型路由](./MODEL_ROUTING_RULES.md) 选择。
+每次收到任务时，先按任务复杂度选择执行方式；具体模型按 [模型路由](/Users/chenjianwei2/.codex/agent-rules/MODEL_ROUTING_RULES.md) 选择。
 
 - 简单任务：不改代码且目标明确、低风险的查询、提取、翻译或格式转换，由当前主代理直接完成。
 - 常规任务：任何普通代码修改（包括单文件 Bug 修复）必须委派给 `standard_worker`。

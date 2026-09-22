@@ -8,5 +8,6 @@
 | 规划、实施或验证非简单任务 | [通用工作原则](/Users/chenjianwei2/.codex/agent-rules/WORKING_RULES.md) |
 | 打开页面或调试网页 | [浏览器调试](/Users/chenjianwei2/.codex/agent-rules/BROWSER_RULES.md) |
 | 新建函数或修改代码 | [函数注释规范](/Users/chenjianwei2/.codex/agent-rules/CODE_STYLE_RULES.md) |
+| 新增、迁移或修改测试代码 | [测试目录布局](/Users/chenjianwei2/.codex/agent-rules/TEST_LAYOUT_RULES.md) |
 | 实施或评审相关代码 | [代码评审与工程约束](/Users/chenjianwei2/.codex/agent-rules/CODE_REVIEW_RULES.md) |
 | 执行 shell 命令 | [RTK 命令规则](/Users/chenjianwei2/.codex/agent-rules/RTK.md) |

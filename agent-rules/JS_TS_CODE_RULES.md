@@ -2,7 +2,7 @@
 
 新增、修改或评审 `.js`、`.jsx`、`.mjs`、`.cjs`、`.ts`、`.tsx`、`.mts`、`.cts`、`.vue` 文件时遵循本规范；在 Vue 单文件组件中，本规范适用于 `<script>`、`<script setup>`、模板表达式及其调用的 JavaScript/TypeScript 逻辑。项目已有 ESLint、Prettier、TypeScript、Vue 编译器与运行时约束优先；本文件规定项目配置未完整表达的语言级约束。
 
-函数 JSDoc 由 [函数注释规范](/Users/chenjianwei2/.codex/agent-rules/CODE_STYLE_RULES.md) 负责，测试目录由 [测试目录布局](/Users/chenjianwei2/.codex/agent-rules/TEST_LAYOUT_RULES.md) 负责，安全、生命周期、测试策略和交付验证由 [代码评审与工程约束](/Users/chenjianwei2/.codex/agent-rules/CODE_REVIEW_RULES.md) 负责，不在本文件重复维护。
+测试目录由 [测试目录布局](/Users/chenjianwei2/.codex/agent-rules/TEST_LAYOUT_RULES.md) 负责，安全、生命周期、测试策略和交付验证由 [代码评审与工程约束](/Users/chenjianwei2/.codex/agent-rules/CODE_REVIEW_RULES.md) 负责，不在本文件重复维护。
 
 ## 1. 语言与运行时
 
@@ -35,6 +35,30 @@
 - 默认不修改调用方传入的对象和数组；确需原地修改时通过函数名、类型和注释明确所有权，并限制在局部边界。
 - 公共函数的返回值保持单一语义；多种结果使用可辨识联合、结构化结果或明确异常，不混用用户文案、哨兵字符串、`null` 和正常数据表示状态。
 - 删除消费者时同步删除仅为其服务的计算、分支、导入和异常处理，不保留无可观察作用的代码。
+
+### 函数 JSDoc
+
+- 新建函数时，在函数定义正上方添加 JSDoc；第一行说明函数职责，并包含完整的 `@param` 与 `@returns`，无参数时省略 `@param`。
+- 对象参数使用 `@param` 展开需要说明的属性；文档中的参数名、可选性、返回结构必须与真实类型和运行时行为一致。
+- 函数可能抛出需要调用方处理的异常时使用 `@throws`；非显然用法使用 `@example`；废弃 API 使用 `@deprecated` 指明替代方案。JavaScript 中的独立复杂类型可按需使用 `@type` 或 `@typedef`。
+
+```typescript
+/**
+ * 根据用户 ID 获取用户名称
+ *
+ * @param userId - 用户的唯一标识符
+ * @param options - 请求配置项
+ * @param options.timeout - 超时时间（毫秒）
+ * @param options.retry - 是否重试
+ * @returns 用户姓名
+ */
+async function getUserName(
+  userId: string,
+  options: { timeout: number; retry?: boolean },
+): Promise<string> {
+  // ...
+}
+```
 
 ## 5. TypeScript 类型
 

@@ -9,7 +9,8 @@
 | 打开页面或调试网页 | [浏览器调试](/Users/chenjianwei2/.codex/agent-rules/BROWSER_RULES.md) |
 | 新建函数，或新增、修改 JavaScript、TypeScript 或 Vue 脚本代码 | [JavaScript 与 TypeScript 代码规范](/Users/chenjianwei2/.codex/agent-rules/JS_TS_CODE_RULES.md) |
 | 评审 `.js`、`.jsx`、`.mjs`、`.cjs`、`.ts`、`.tsx`、`.mts`、`.cts` 或 Vue 脚本代码 | [JavaScript 与 TypeScript 代码评审](/Users/chenjianwei2/.codex/agent-rules/JS_TS_REVIEW_RULES.md) |
-| 新增、修改或评审 HTML 或 Vue 模板 | [HTML 代码规范](/Users/chenjianwei2/.codex/agent-rules/HTML_CODE_RULES.md) |
-| 新增、迁移或修改测试代码 | [测试目录布局](/Users/chenjianwei2/.codex/agent-rules/TEST_LAYOUT_RULES.md) |
-| 实施或评审相关代码 | [代码评审与工程约束](/Users/chenjianwei2/.codex/agent-rules/CODE_REVIEW_RULES.md) |
+| 新增、修改或评审 HTML、Vue 模板或 JSX/TSX 界面标记 | [HTML 代码规范](/Users/chenjianwei2/.codex/agent-rules/HTML_CODE_RULES.md) |
+| 新增、迁移、修改或评审测试文件与测试用例 | [测试规则](/Users/chenjianwei2/.codex/agent-rules/TEST_RULES.md) |
+| 完成任何代码新增、修改、删除或重构后，在交付前自动执行代码评审；不等待用户另行触发 | [代码评审与工程约束](/Users/chenjianwei2/.codex/agent-rules/CODE_REVIEW_RULES.md) |
+| 代码修改完成且验证通过后，项目根目录存在 `README.md` | [README 同步规则](/Users/chenjianwei2/.codex/agent-rules/README_SYNC_RULES.md) |
 | 执行 shell 命令 | [RTK 命令规则](/Users/chenjianwei2/.codex/agent-rules/RTK.md) |

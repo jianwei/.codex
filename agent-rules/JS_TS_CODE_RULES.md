@@ -2,7 +2,7 @@
 
 新增、修改或评审 `.js`、`.jsx`、`.mjs`、`.cjs`、`.ts`、`.tsx`、`.mts`、`.cts`、`.vue` 文件时遵循本规范；在 Vue 单文件组件中，本规范适用于 `<script>`、`<script setup>`、模板表达式及其调用的 JavaScript/TypeScript 逻辑。项目已有 ESLint、Prettier、TypeScript、Vue 编译器与运行时约束优先；本文件规定项目配置未完整表达的语言级约束。
 
-测试目录由 [测试目录布局](/Users/chenjianwei2/.codex/agent-rules/TEST_LAYOUT_RULES.md) 负责，安全、生命周期、测试策略和交付验证由 [代码评审与工程约束](/Users/chenjianwei2/.codex/agent-rules/CODE_REVIEW_RULES.md) 负责，不在本文件重复维护。
+测试目录与测试用例由 [测试规则](/Users/chenjianwei2/.codex/agent-rules/TEST_RULES.md) 负责，安全、生命周期、测试策略和交付验证由 [代码评审与工程约束](/Users/chenjianwei2/.codex/agent-rules/CODE_REVIEW_RULES.md) 负责，不在本文件重复维护。
 
 ## 1. 语言与运行时
 

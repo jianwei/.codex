@@ -1,6 +1,6 @@
 # HTML 代码规范
 
-新增、修改或评审 `.html`、`.htm`、生成 HTML 的模板文件，以及 Vue 单文件组件的 `<template>` 时遵循本规范。项目已有 HTML lint、框架编译器、组件库和设计系统约束优先；本文件规定工具配置未完整表达的 HTML 语义、可访问性和文档结构约束。
+新增、修改或评审 `.html`、`.htm`、生成 HTML 的模板文件、Vue 单文件组件的 `<template>`，以及 JSX/TSX 界面标记时遵循本规范。项目已有 HTML lint、框架编译器、组件库和设计系统约束优先；本文件规定工具配置未完整表达的 HTML 语义、可访问性和文档结构约束。
 
 模板表达式中的 JavaScript/TypeScript 由 [JavaScript 与 TypeScript 代码规范](/Users/chenjianwei2/.codex/agent-rules/JS_TS_CODE_RULES.md) 负责，动态 HTML、安全边界、交互测试和交付验证由 [代码评审与工程约束](/Users/chenjianwei2/.codex/agent-rules/CODE_REVIEW_RULES.md) 负责，不在本文件重复维护。
 
@@ -54,6 +54,8 @@
 - 图片声明可获得的固有 `width` 和 `height` 或使用稳定纵横比，避免加载时布局偏移；非首屏图片按实际场景使用原生懒加载。
 - 响应式图片按需要使用 `srcset`、`sizes` 或 `picture`，不向小视口无条件传输远超展示尺寸的资源。
 - 音视频提供用户可控制的播放方式；非必要不自动播放，自动播放必须静音并符合平台策略。承载关键信息时提供字幕、文本替代或产品合同要求的辅助内容。
+- 默认使用应用路由、组件、链接或接口集成承载页面和外部内容，不新增 `iframe`。当前用户请求已明确授权使用 `iframe` 时，可按授权范围继续实施。
+- 实现过程中判断必须使用 `iframe`，但当前请求尚未明确授权时，先说明必须使用的原因、嵌入目标及域名、数据与权限边界、已评估的替代方案和计划采用的安全限制，然后暂停相关实施并取得用户明确确认；确认前不得编写或引入 `iframe`。
 - iframe 提供可识别 `title`，按最小权限配置 `sandbox`、`allow` 与 referrer policy；外部嵌入内容不得默认获得不需要的能力。
 
 ## 7. 可访问性

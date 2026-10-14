@@ -4,7 +4,7 @@
 
 | 触发条件 | 必须读取的规则 |
 | --- | --- |
-| 每次任务开始 | [语言与沟通](/Users/chenjianwei2/.codex/agent-rules/LANGUAGE_RULES.md)、[代理路由](/Users/chenjianwei2/.codex/agent-rules/AGENT_ROUTING_RULES.md)、[模型路由](/Users/chenjianwei2/.codex/agent-rules/MODEL_ROUTING_RULES.md)、[Skill 路由](/Users/chenjianwei2/.codex/agent-rules/SKILL_ROUTING_RULES.md) |
+| 每次任务开始 | [语言与沟通](/Users/chenjianwei2/.codex/agent-rules/LANGUAGE_RULES.md)、[任务路由](/Users/chenjianwei2/.codex/agent-rules/TASK_ROUTING_RULES.md)、[Skill 路由](/Users/chenjianwei2/.codex/agent-rules/SKILL_ROUTING_RULES.md) |
 | 规划、实施或验证非简单任务 | [通用工作原则](/Users/chenjianwei2/.codex/agent-rules/WORKING_RULES.md) |
 | 打开页面或调试网页 | [浏览器调试](/Users/chenjianwei2/.codex/agent-rules/BROWSER_RULES.md) |
 | 新建函数，或新增、修改 JavaScript、TypeScript 或 Vue 脚本代码 | [JavaScript 与 TypeScript 代码规范](/Users/chenjianwei2/.codex/agent-rules/JS_TS_CODE_RULES.md) |
